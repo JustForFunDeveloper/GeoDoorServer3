@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GeoDoorServer3.Data;
+using GeoDoorServer3.Hubs;
+using GeoDoorServer3.Workers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +38,11 @@ namespace GeoDoorServer3
             services.AddDbContext<UserDbContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddHostedService<Worker>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,6 +65,11 @@ namespace GeoDoorServer3
             app.UseStaticFiles();
 
             app.UseAuthentication();
+
+            app.UseSignalR((routes) =>
+            {
+                routes.MapHub<ClockHub>("/hubs/clock");
+            });
 
             app.UseMvc(routes =>
             {
