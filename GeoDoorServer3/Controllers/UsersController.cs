@@ -58,10 +58,11 @@ namespace GeoDoorServer3.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PhoneId,Name,AccessRights,LastConnection")] User user)
+        public async Task<IActionResult> Create([Bind("Id,PhoneId,Name,AccessRights")] User user)
         {
             if (ModelState.IsValid)
             {
+                user.LastConnection = DateTime.Now;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
