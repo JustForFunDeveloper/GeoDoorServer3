@@ -36,6 +36,10 @@ namespace GeoDoorServer3
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddScoped<IOpenHabMessageService, OpenHabMessageService>();
+
+            services.AddHostedService<TimedOpenHabService>();
+            services.AddScoped<IScopedOpenHabService, ScopedOpenHabService>();
+            services.AddSingleton<IDataSingleton, DataSingleton>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,7 +61,6 @@ namespace GeoDoorServer3
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 

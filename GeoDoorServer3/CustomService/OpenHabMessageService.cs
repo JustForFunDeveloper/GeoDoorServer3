@@ -16,20 +16,18 @@ namespace GeoDoorServer3.CustomService
             _logger = logger;
         }
 
-        public async Task<string> GetData(string itemName)
+        public async Task<string> GetData(string itemPath)
         {
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://192.168.1.114:8080/rest/items/");
             client.DefaultRequestHeaders
                 .Accept
-                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                .Add(new MediaTypeWithQualityHeaderValue("text/plain"));
 
-            var result = await client.GetStringAsync("http://192.168.1.114:8080/rest/items/eg_buero");
+            var result = await client.GetStringAsync(itemPath);
 
             _logger.LogError($"{DateTime.Now}:  GetData=> {result}");
 
             return result;
-            //return await Task.Run(() => "");
         }
 
         public async Task<bool> PostData(string itemName)
