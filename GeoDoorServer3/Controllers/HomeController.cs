@@ -53,14 +53,14 @@ namespace GeoDoorServer3.Controllers
                 get { return _iDataSingleton.GetData(); }
             }
 
-            public string OnlineTime
-            {
-                get
-                {
-                    TimeSpan timeSpan = _iDataSingleton.GetData().OnlineTimeSpan;
-                    return timeSpan.ToString(@"hh\:mm\:ss");
-                }
-            }
+            //public string OnlineTime
+            //{
+            //    get
+            //    {
+            //        TimeSpan timeSpan = _iDataSingleton.GetData().OnlineTimeSpan;
+            //        return timeSpan.ToString(@"hh\:mm\:ss");
+            //    }
+            //}
         }
     }
 }

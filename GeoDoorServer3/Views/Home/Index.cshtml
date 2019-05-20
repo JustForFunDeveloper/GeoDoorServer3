@@ -1,11 +1,97 @@
-﻿@model GeoDoorServer3.Controllers.HomeController.DataModel
+﻿@using Microsoft.AspNetCore.Identity
+@model GeoDoorServer3.Controllers.HomeController.DataModel
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 @{
     ViewData["Title"] = "Home Page";
 }
 
     <div class="text-center">
-        <h1 class="display-4">@Html.DisplayFor(modelItem => modelItem.OpenHabStatus.GateStatus)</h1>
-        <h1 class="display-4">@Html.DisplayFor(modelItem => modelItem.OnlineTime)</h1>
-        <h1 class="display-4">@Html.DisplayFor(modelItem => modelItem.OpenHabStatus.StartTime)</h1>
-        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <h1 class="h1" style="font-size: 60px">Geo<span style="color: #4878C0">Door</span> Server</h1>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <div class="card-deck" style="margin-top: 20px">
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-header">
+                        <h4><span style="color: #4878C0">Online Time</span></h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Online Time</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-header">
+                        <h4><span style="color: #4878C0">User allowed</span></h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">User allowed</h5>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-header">
+                        <h4><span style="color: #4878C0">User registered</span></h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">User registered</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-deck" style="margin-top: 20px">
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-header">
+                        <h4><span style="color: #4878C0">Last Users</span></h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Online Time</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-header">
+                        <h4><span style="color: #4878C0">Last Connection</span></h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">User allowed</h5>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-header">
+                        <h4><span style="color: #4878C0">Errors</span></h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">User registered</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p>Welcome to the Geo<span style="color: #4878c0">Door</span> User Management platform.</p>
+            <img src="~/images/home/GeoDoor.svg" alt="GeoDoor" height="200px" style="margin-top: 30px" />
+            <p style="margin-top: 40px">Click here to get started</p>
+            <a asp-area="Identity" asp-page="/Account/Login">
+                <button class="btn btn-dark" style="width: 25%">Login</button>
+            </a>
+        }
     </div>
