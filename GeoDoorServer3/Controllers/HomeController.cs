@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using GeoDoorServer3.CustomService;
 using GeoDoorServer3.CustomService.Models;
 using GeoDoorServer3.Data;
 using Microsoft.AspNetCore.Mvc;
 using GeoDoorServer3.Models;
+using Remotion.Linq.Clauses;
 
 namespace GeoDoorServer3.Controllers
 {
@@ -21,6 +24,12 @@ namespace GeoDoorServer3.Controllers
             _iDataSingleton = dataSingleton;
             _context.Database.EnsureCreated();
             _myDataModel = new DataModel(_iDataSingleton);
+            _myDataModel.LogMessagesList = new List<string>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                _myDataModel.LogMessagesList.Add(i.ToString());
+            }
         }
 
         public IActionResult Index()
@@ -53,14 +62,22 @@ namespace GeoDoorServer3.Controllers
                 get { return _iDataSingleton.GetData(); }
             }
 
-            //public string OnlineTime
-            //{
-            //    get
-            //    {
-            //        TimeSpan timeSpan = _iDataSingleton.GetData().OnlineTimeSpan;
-            //        return timeSpan.ToString(@"hh\:mm\:ss");
-            //    }
-            //}
+            public string OnlineTime
+            {
+                get
+                {
+                    TimeSpan timeSpan = _iDataSingleton.GetData().OnlineTimeSpan;
+                    return timeSpan.ToString(@"hh\:mm\:ss");
+                }
+            }
+
+            public int UsersAllowed { get; set; }
+            public int UsersRegistered { get; set; }
+            public List<string> LastUsers { get; set; }
+            public DateTime LastConnection { get; set; }
+            public int Errors { get; set; }
+
+            public List<string> LogMessagesList { get; set; }
         }
     }
 }

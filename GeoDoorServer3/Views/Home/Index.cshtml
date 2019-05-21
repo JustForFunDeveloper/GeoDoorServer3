@@ -15,35 +15,28 @@
                     <div class="card-header">
                         <h4><span style="color: #4878C0">Online Time</span></h4>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Online Time</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">Last updated 3 mins ago</small>
+                    <div class="card-body align-items-center d-flex justify-content-center">
+                        <h5 class="card-title ">@Model.OnlineTime</h5>
                     </div>
                 </div>
                 <div class="card text-white bg-dark mb-3">
                     <div class="card-header">
                         <h4><span style="color: #4878C0">User allowed</span></h4>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body align-items-center d-flex justify-content-center">
                         <h5 class="card-title">User allowed</h5>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">Last updated 3 mins ago</small>
                     </div>
                 </div>
                 <div class="card text-white bg-dark mb-3">
                     <div class="card-header">
                         <h4><span style="color: #4878C0">User registered</span></h4>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">User registered</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">Last updated 3 mins ago</small>
+                    <div class="card-body align-items-center d-flex justify-content-center">
+                        <div>
+                            <h5 class="card-title" style="margin: 0px">User registered</h5>
+                            <h5 class="card-title" style="margin: 0px">User registered</h5>
+                            <h5 class="card-title" style="margin: 0px">User registered</h5>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -52,36 +45,38 @@
                     <div class="card-header">
                         <h4><span style="color: #4878C0">Last Users</span></h4>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Online Time</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">Last updated 3 mins ago</small>
+                    <div class="card-body align-items-center d-flex justify-content-center">
+                        <div>
+                            <h5 class="card-title">Online Time</h5>
+                        </div>
                     </div>
                 </div>
                 <div class="card text-white bg-dark mb-3">
                     <div class="card-header">
                         <h4><span style="color: #4878C0">Last Connection</span></h4>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body align-items-center d-flex justify-content-center">
                         <h5 class="card-title">User allowed</h5>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">Last updated 3 mins ago</small>
                     </div>
                 </div>
                 <div class="card text-white bg-dark mb-3">
                     <div class="card-header">
                         <h4><span style="color: #4878C0">Errors</span></h4>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body align-items-center d-flex justify-content-center">
                         <h5 class="card-title">User registered</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
                     </div>
-                    <div class="card-footer">
-                        <small class="text-muted">Last updated 3 mins ago</small>
-                    </div>
+                </div>
+            </div>
+            <div class="card text-white bg-dark mb-3" style="margin-top: 20px">
+                <div class="card-header">
+                    <h4><span style="color: #4878C0">Log</span></h4>
+                </div>
+                <div class="card-body" style="overflow-y: scroll; height: 400px">
+                    @foreach (var item in Model.LogMessagesList)
+                    {
+                        <p class="card-text text-left" style="margin: 0px">@item</p>
+                    }
                 </div>
             </div>
         }
