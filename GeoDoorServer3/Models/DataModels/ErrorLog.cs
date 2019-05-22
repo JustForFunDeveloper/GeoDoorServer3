@@ -9,5 +9,10 @@ namespace GeoDoorServer3.Models.DataModels
         public LogLevel LogLevel { get; set; } 
         public DateTime MsgDateTime { get; set; }
         public string Message { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Id}: {LogLevel} - {MsgDateTime} => {Message}";
+        }
     }
 }

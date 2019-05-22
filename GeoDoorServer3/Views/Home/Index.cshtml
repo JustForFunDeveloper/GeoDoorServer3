@@ -24,7 +24,7 @@
                         <h4><span style="color: #4878C0">User allowed</span></h4>
                     </div>
                     <div class="card-body align-items-center d-flex justify-content-center">
-                        <h5 class="card-title">User allowed</h5>
+                        <h5 class="card-title">@Model.UsersAllowed</h5>
                     </div>
                 </div>
                 <div class="card text-white bg-dark mb-3">
@@ -33,9 +33,7 @@
                     </div>
                     <div class="card-body align-items-center d-flex justify-content-center">
                         <div>
-                            <h5 class="card-title" style="margin: 0px">User registered</h5>
-                            <h5 class="card-title" style="margin: 0px">User registered</h5>
-                            <h5 class="card-title" style="margin: 0px">User registered</h5>
+                            <h5 class="card-title" style="margin: 0px">@Model.UsersRegistered</h5>
                         </div>
                     </div>
                 </div>
@@ -47,7 +45,10 @@
                     </div>
                     <div class="card-body align-items-center d-flex justify-content-center">
                         <div>
-                            <h5 class="card-title">Online Time</h5>
+                            @foreach (var user in Model.LastUsers)
+                            {
+                                <h5 class="card-title" style="margin: 0px">@user</h5>
+                            }
                         </div>
                     </div>
                 </div>
@@ -56,7 +57,7 @@
                         <h4><span style="color: #4878C0">Last Connection</span></h4>
                     </div>
                     <div class="card-body align-items-center d-flex justify-content-center">
-                        <h5 class="card-title">User allowed</h5>
+                        <h5 class="card-title">@Model.LastConnection</h5>
                     </div>
                 </div>
                 <div class="card text-white bg-dark mb-3">
@@ -64,7 +65,7 @@
                         <h4><span style="color: #4878C0">Errors</span></h4>
                     </div>
                     <div class="card-body align-items-center d-flex justify-content-center">
-                        <h5 class="card-title">User registered</h5>
+                        <h5 class="card-title">@Model.Errors</h5>
                     </div>
                 </div>
             </div>

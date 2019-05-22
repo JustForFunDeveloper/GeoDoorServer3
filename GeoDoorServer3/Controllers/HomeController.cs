@@ -7,7 +7,8 @@ using GeoDoorServer3.CustomService.Models;
 using GeoDoorServer3.Data;
 using Microsoft.AspNetCore.Mvc;
 using GeoDoorServer3.Models;
-using Remotion.Linq.Clauses;
+using GeoDoorServer3.Models.DataModels;
+using Microsoft.Extensions.Logging;
 
 namespace GeoDoorServer3.Controllers
 {
@@ -24,11 +25,27 @@ namespace GeoDoorServer3.Controllers
             _iDataSingleton = dataSingleton;
             _context.Database.EnsureCreated();
             _myDataModel = new DataModel(_iDataSingleton);
-            _myDataModel.LogMessagesList = new List<string>();
 
-            for (int i = 0; i < 10; i++)
+
+            List<User> users = _context.Users.OrderByDescending(u => u.LastConnection).ToList();
+            _myDataModel.LastUsers = new List<string>();
+            foreach (var user in users)
             {
-                _myDataModel.LogMessagesList.Add(i.ToString());
+                if (_myDataModel.LastUsers.Count <= 3)
+                    _myDataModel.LastUsers.Add(user.Name);
+            }
+
+            _myDataModel.LastConnection = users[0].LastConnection;
+            _myDataModel.UsersAllowed = _context.Users.Where(u => u.AccessRights.Equals(AccessRights.Allowed)).ToList().Count;
+            _myDataModel.UsersRegistered = _context.Users.ToList().Count;
+
+
+            _myDataModel.Errors = _context.ErrorLogs.Where(e => e.LogLevel.Equals(LogLevel.Error)).ToList().Count();
+            _myDataModel.LogMessagesList = new List<string>();
+            List<ErrorLog> errorLogs = _context.ErrorLogs.OrderByDescending(e => e.MsgDateTime).TakeLast(100).ToList();
+            foreach (var errorLog in errorLogs)
+            {
+                _myDataModel.LogMessagesList.Add(errorLog.ToString());
             }
         }
 
