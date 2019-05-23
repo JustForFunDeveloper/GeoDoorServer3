@@ -25,7 +25,6 @@ namespace GeoDoorServer3.Controllers
         {
             _context = context;
             _iDataSingleton = dataSingleton;
-            _context.Database.EnsureCreated();
             _myDataModel = new DataModel(_iDataSingleton);
 
 
@@ -37,7 +36,8 @@ namespace GeoDoorServer3.Controllers
                     _myDataModel.LastUsers.Add(user.Name);
             }
 
-            _myDataModel.LastConnection = users[0].LastConnection;
+            if(users.Count > 0)
+                _myDataModel.LastConnection = users[0].LastConnection;
             _myDataModel.UsersAllowed = _context.Users.Where(u => u.AccessRights.Equals(AccessRights.Allowed)).ToList().Count;
             _myDataModel.UsersRegistered = _context.Users.ToList().Count;
 
@@ -63,6 +63,11 @@ namespace GeoDoorServer3.Controllers
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult About()
         {
             return View();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -60,6 +61,9 @@ namespace GeoDoorServer3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,PhoneId,Name,AccessRights")] User user)
         {
+            if (_context.Users.Any(u => u.PhoneId.Equals(user.PhoneId)))
+                ModelState.AddModelError("PhoneId","" +
+                                                   $"PhoneId '{user.PhoneId}' does already exist!");
             if (ModelState.IsValid)
             {
                 user.LastConnection = DateTime.Now;
@@ -91,9 +95,10 @@ namespace GeoDoorServer3.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PhoneId,Name,AccessRights,LastConnection")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,AccessRights")] User user)
         {
-            if (id != user.Id)
+            User currentUser = await _context.Users.SingleOrDefaultAsync(u => u.Id.Equals(id));
+            if (id != currentUser.Id)
             {
                 return NotFound();
             }
@@ -102,12 +107,14 @@ namespace GeoDoorServer3.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    currentUser.Name = user.Name;
+                    currentUser.AccessRights = user.AccessRights;
+                    _context.Update(currentUser);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    if (!UserExists(currentUser.Id))
                     {
                         return NotFound();
                     }
