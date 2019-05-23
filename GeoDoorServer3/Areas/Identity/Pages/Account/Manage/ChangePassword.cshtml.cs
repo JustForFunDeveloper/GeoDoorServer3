@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using GeoDoorServer3.CustomService;
+using GeoDoorServer3.Models.DataModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,15 +16,17 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<ChangePasswordModel> _logger;
+        private readonly IDataSingleton _iDataSingleton;
 
         public ChangePasswordModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            ILogger<ChangePasswordModel> logger)
+            ILogger<ChangePasswordModel> logger, IDataSingleton iDataSingleton)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _iDataSingleton = iDataSingleton;
         }
 
         [BindProperty]
@@ -92,6 +96,12 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.RefreshSignInAsync(user);
             _logger.LogInformation("User changed their password successfully.");
+            _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+            {
+                LogLevel = LogLevel.Debug,
+                MsgDateTime = DateTime.Now,
+                Message = $"{User} changed their password successfully."
+            });
             StatusMessage = "Your password has been changed.";
 
             return RedirectToPage();

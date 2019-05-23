@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GeoDoorServer3.API.Model;
 using GeoDoorServer3.CustomService;
 using GeoDoorServer3.Data;
+using GeoDoorServer3.Models.DataModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -15,15 +16,15 @@ namespace GeoDoorServer3.API
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
-        private readonly ILogger<ValuesController> _logger;
         private readonly UserDbContext _context;
         private readonly IOpenHabMessageService _openHab;
+        private readonly IDataSingleton _iDataSingleton;
 
-        public ValuesController(UserDbContext context, ILogger<ValuesController> logger, IOpenHabMessageService openHab)
+        public ValuesController(UserDbContext context, IOpenHabMessageService openHab, IDataSingleton iDataSingleton)
         {
             _context = context;
-            _logger = logger;
             _openHab = openHab;
+            _iDataSingleton = iDataSingleton;
 
             _items.Add(new CommandItem()
             {
@@ -46,7 +47,13 @@ namespace GeoDoorServer3.API
         [HttpGet("{id}")]
         public async Task<ActionResult<CommandItem>> GetCommandItem(int id)
         {
-            _logger.LogError($"--- {DateTime.Now}: GetCommandItem id=> {id}");
+            _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+            {
+                LogLevel = LogLevel.Debug,
+                MsgDateTime = DateTime.Now,
+                Message = $"GetCommandItem id => { id}"
+            });
+
             await _openHab.GetData("dsa");
             var commandItem = await GetItemAsync(id);
             if (null != commandItem)
@@ -66,8 +73,13 @@ namespace GeoDoorServer3.API
         [HttpPost]
         public async Task<ActionResult<CommandItem>> PostCommandItem(CommandItem item)
         {
-            _logger.LogError(
-                $"--- {DateTime.Now}: Post id=> {item.Id} | CommandName=> {item.CommandName} | Command=> {item.Command}");
+            _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+            {
+                LogLevel = LogLevel.Debug,
+                MsgDateTime = DateTime.Now,
+                Message = $"Post id=> {item.Id} | CommandName=> {item.CommandName} | Command=> {item.Command}"
+            });
+
             await PutItemAsync(item);
             await _openHab.PostData("whatever");
 
@@ -88,14 +100,12 @@ namespace GeoDoorServer3.API
         [HttpPut("{id}")]
         public void Put(int id, string name, [FromBody] string value)
         {
-            _logger.LogError($"--- {DateTime.Now}: Put name=> {name} | id=> {id}");
         }
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public void Delete(int id, string name)
         {
-            _logger.LogError($"--- {DateTime.Now}: Delete name=> {name} | id=> {id}");
         }
     }
 }

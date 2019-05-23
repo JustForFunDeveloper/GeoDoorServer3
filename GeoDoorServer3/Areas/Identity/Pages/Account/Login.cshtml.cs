@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using GeoDoorServer3.CustomService;
+using GeoDoorServer3.Models.DataModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -17,11 +19,13 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IDataSingleton _iDataSingleton;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, IDataSingleton iDataSingleton)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _iDataSingleton = iDataSingleton;
         }
 
         [BindProperty]
@@ -77,6 +81,12 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+                    {
+                        LogLevel = LogLevel.Debug,
+                        MsgDateTime = DateTime.Now,
+                        Message = $"{Input.UserName} logged in."
+                    });
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -86,6 +96,12 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
+                    _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+                    {
+                        LogLevel = LogLevel.Debug,
+                        MsgDateTime = DateTime.Now,
+                        Message = $"{Input.UserName} account locked out."
+                    });
                     return RedirectToPage("./Lockout");
                 }
                 else

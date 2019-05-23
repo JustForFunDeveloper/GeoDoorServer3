@@ -3,17 +3,18 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using GeoDoorServer3.Models.DataModels;
 using Microsoft.Extensions.Logging;
 
 namespace GeoDoorServer3.CustomService
 {
     public class OpenHabMessageService : IOpenHabMessageService
     {
-        private readonly ILogger<OpenHabMessageService> _logger;
+        private readonly IDataSingleton _iDataSingleton;
 
-        public OpenHabMessageService(ILogger<OpenHabMessageService> logger)
+        public OpenHabMessageService(IDataSingleton iDataSingleton)
         {
-            _logger = logger;
+            _iDataSingleton = iDataSingleton;
         }
 
         public async Task<string> GetData(string itemPath)
@@ -25,8 +26,12 @@ namespace GeoDoorServer3.CustomService
 
             var result = await client.GetStringAsync(itemPath);
 
-            _logger.LogError($"{DateTime.Now}:  GetData=> {result}");
-
+            _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+            {
+                LogLevel = LogLevel.Debug,
+                MsgDateTime = DateTime.Now,
+                Message = $"GetOpenHabStatus => {result}"
+            });
             return result;
         }
 
@@ -46,12 +51,14 @@ namespace GeoDoorServer3.CustomService
             await client.SendAsync(request)
                 .ContinueWith(responseTask =>
                 {
-                    _logger.LogError($"--- Response: {0}", responseTask.Result);
+                    _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+                    {
+                        LogLevel = LogLevel.Debug,
+                        MsgDateTime = DateTime.Now,
+                        Message = $"Response: {responseTask.Result}"
+                    });
                 });
-
-            _logger.LogError($"--- {DateTime.Now}:  PostData=> {itemName}");
             return false;
-            //return await Task.Run(() => false);
         }
     }
 }

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 using GeoDoorServer3.CustomService.Models;
+using GeoDoorServer3.Models.DataModels;
 
 namespace GeoDoorServer3.CustomService
 {
     public interface IDataSingleton
     {
-        OpenHabStatus GetData();
+        OpenHabStatus GetOpenHabStatus();
+        ConcurrentQueue<ErrorLog> GetConcurrentQueue();
     }
 }

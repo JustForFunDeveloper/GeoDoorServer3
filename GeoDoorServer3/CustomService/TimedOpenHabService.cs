@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using GeoDoorServer3.CustomService.Models;
+using GeoDoorServer3.Models.DataModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,21 +11,30 @@ namespace GeoDoorServer3.CustomService
 {
     internal class TimedOpenHabService : IHostedService, IDisposable
     {
-
         public IServiceProvider Services { get; }
 
-        private readonly ILogger _logger;
         private Timer _timer;
 
-        public TimedOpenHabService(IServiceProvider services ,ILogger<TimedOpenHabService> logger)
+        public TimedOpenHabService(IServiceProvider services)
         {
             Services = services;
-            _logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Background Service is starting.");
+            using (var scope = Services.CreateScope())
+            {
+                var scopedProcessingService =
+                    scope.ServiceProvider
+                        .GetRequiredService<IScopedService>();
+
+                scopedProcessingService.AddQueueMessage(new ErrorLog()
+                {
+                    LogLevel = LogLevel.Information,
+                    MsgDateTime = DateTime.Now,
+                    Message = "Timed Background Service is starting."
+                });
+            }
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
                 TimeSpan.FromSeconds(5));
@@ -38,32 +48,40 @@ namespace GeoDoorServer3.CustomService
             {
                 var scopedProcessingService =
                     scope.ServiceProvider
-                        .GetRequiredService<IScopedOpenHabService>();
+                        .GetRequiredService<IScopedService>();
 
-                string result = await scopedProcessingService.DoWork();
+                string result = await scopedProcessingService.GetDoorStatus();
 
-                using (var dataScope = Services.CreateScope())
-                {
-                    var scopedDataSingleton =
-                        scope.ServiceProvider
-                            .GetRequiredService<IDataSingleton>();
 
-                    if (result.Equals("ON"))
-                        scopedDataSingleton.GetData().GateStatus = GateStatus.GateClosed;
-                    else if (result.Equals("OFF"))
-                        scopedDataSingleton.GetData().GateStatus = GateStatus.GateOpen;
+                var scopedDataSingleton =
+                    scope.ServiceProvider
+                        .GetRequiredService<IDataSingleton>();
 
-                    scopedDataSingleton.GetData().OnlineTimeSpan =
-                        DateTime.Now.Subtract(scopedDataSingleton.GetData().StartTime);
-                }
-                
-                _logger.LogInformation($"-- DoWork: Result=> {result}");
+                if (result.Equals("ON"))
+                    scopedDataSingleton.GetOpenHabStatus().GateStatus = GateStatus.GateClosed;
+                else if (result.Equals("OFF"))
+                    scopedDataSingleton.GetOpenHabStatus().GateStatus = GateStatus.GateOpen;
+
+                scopedDataSingleton.GetOpenHabStatus().OnlineTimeSpan =
+                    DateTime.Now.Subtract(scopedDataSingleton.GetOpenHabStatus().StartTime);
             }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Background Service is stopping.");
+            using (var scope = Services.CreateScope())
+            {
+                var scopedProcessingService =
+                    scope.ServiceProvider
+                        .GetRequiredService<IScopedService>();
+
+                scopedProcessingService.AddQueueMessage(new ErrorLog()
+                {
+                    LogLevel = LogLevel.Information,
+                    MsgDateTime = DateTime.Now,
+                    Message = "Timed Background Service is stopping."
+                });
+            }
 
             _timer?.Change(Timeout.Infinite, 0);
 

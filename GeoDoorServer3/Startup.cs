@@ -38,7 +38,8 @@ namespace GeoDoorServer3
             services.AddScoped<IOpenHabMessageService, OpenHabMessageService>();
 
             services.AddHostedService<TimedOpenHabService>();
-            services.AddScoped<IScopedOpenHabService, ScopedOpenHabService>();
+            services.AddHostedService<TimedLoggingService>();
+            services.AddScoped<IScopedService, ScopedService>();
             services.AddSingleton<IDataSingleton, DataSingleton>();
         }
 

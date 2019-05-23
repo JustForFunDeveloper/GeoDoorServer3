@@ -17,6 +17,8 @@ namespace GeoDoorServer3.Controllers
         private readonly UserDbContext _context;
         private readonly IDataSingleton _iDataSingleton;
 
+        private int _max_Count = 100;
+
         private DataModel _myDataModel { get; set; }
 
         public HomeController(UserDbContext context, IDataSingleton dataSingleton)
@@ -42,10 +44,16 @@ namespace GeoDoorServer3.Controllers
 
             _myDataModel.Errors = _context.ErrorLogs.Where(e => e.LogLevel.Equals(LogLevel.Error)).ToList().Count();
             _myDataModel.LogMessagesList = new List<string>();
-            List<ErrorLog> errorLogs = _context.ErrorLogs.OrderByDescending(e => e.MsgDateTime).TakeLast(100).ToList();
+            List<ErrorLog> errorLogs = _context.ErrorLogs.OrderByDescending(e => e.MsgDateTime).ToList();
+
+            int iter = 0;
             foreach (var errorLog in errorLogs)
             {
+                if (iter >= _max_Count)
+                    break;
+
                 _myDataModel.LogMessagesList.Add(errorLog.ToString());
+                iter++;
             }
         }
 
@@ -76,14 +84,14 @@ namespace GeoDoorServer3.Controllers
 
             public OpenHabStatus OpenHabStatus
             {
-                get { return _iDataSingleton.GetData(); }
+                get { return _iDataSingleton.GetOpenHabStatus(); }
             }
 
             public string OnlineTime
             {
                 get
                 {
-                    TimeSpan timeSpan = _iDataSingleton.GetData().OnlineTimeSpan;
+                    TimeSpan timeSpan = _iDataSingleton.GetOpenHabStatus().OnlineTimeSpan;
                     return timeSpan.ToString(@"hh\:mm\:ss");
                 }
             }
