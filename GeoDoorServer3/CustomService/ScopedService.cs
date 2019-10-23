@@ -14,11 +14,12 @@ namespace GeoDoorServer3.CustomService
         void AddQueueMessage(ErrorLog errorLog);
     }
 
+    // TODO _doorPath should be configurable.
+
     internal class ScopedService : IScopedService
     {
         private readonly IOpenHabMessageService _openHab;
         private readonly IDataSingleton _dataSingleton;
-        private readonly string _doorPath = "http://192.168.1.114:8080/rest/items/eg_buero/state";
         private readonly UserDbContext _context;
 
         public ScopedService(IOpenHabMessageService openHab, IDataSingleton dataSingleton, UserDbContext context)
@@ -30,7 +31,7 @@ namespace GeoDoorServer3.CustomService
 
         public async Task<string> GetDoorStatus()
         {
-            return await _openHab.GetData(_doorPath);     
+            return await _openHab.GetData(_dataSingleton.GetGatePath());     
         }
 
         public OpenHabStatus GetOpenHabStatus()
@@ -40,7 +41,7 @@ namespace GeoDoorServer3.CustomService
 
         public void WriteErrorLogs()
         {
-            ConcurrentQueue<ErrorLog> concurrentQueue = _dataSingleton.GetConcurrentQueue();
+            ConcurrentQueue<ErrorLog> concurrentQueue = _dataSingleton.GetQueue();
 
             foreach (var item in concurrentQueue)
             {
@@ -53,7 +54,7 @@ namespace GeoDoorServer3.CustomService
 
         public void AddQueueMessage(ErrorLog errorLog)
         {
-            _dataSingleton.GetConcurrentQueue().Enqueue(errorLog);
+            _dataSingleton.AddErrorLog(errorLog);
         }
     }
 }

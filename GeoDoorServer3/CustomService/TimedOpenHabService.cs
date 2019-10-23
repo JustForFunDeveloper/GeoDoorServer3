@@ -9,12 +9,17 @@ using Microsoft.Extensions.Logging;
 
 namespace GeoDoorServer3.CustomService
 {
+    // TODO: _timerValue should be configurable
+
+    /// <summary>
+    /// This service just checks every _timerValue seconds if the gate is open or not.
+    /// </summary>
     internal class TimedOpenHabService : IHostedService, IDisposable
     {
-        public IServiceProvider Services { get; }
-
         private Timer _timer;
-
+        private readonly int _timerValue = 5;
+        public IServiceProvider Services { get; }
+        
         public TimedOpenHabService(IServiceProvider services)
         {
             Services = services;
@@ -37,7 +42,7 @@ namespace GeoDoorServer3.CustomService
             }
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(5));
+                TimeSpan.FromSeconds(_timerValue));
 
             return Task.CompletedTask;
         }

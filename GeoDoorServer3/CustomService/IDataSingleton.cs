@@ -6,7 +6,12 @@ namespace GeoDoorServer3.CustomService
 {
     public interface IDataSingleton
     {
+        string GetGatePath();
+        string SetGatePath();
+
         OpenHabStatus GetOpenHabStatus();
-        ConcurrentQueue<ErrorLog> GetConcurrentQueue();
+
+        ConcurrentQueue<ErrorLog> GetQueue();
+        void AddErrorLog(ErrorLog errorLog);
     }
 }

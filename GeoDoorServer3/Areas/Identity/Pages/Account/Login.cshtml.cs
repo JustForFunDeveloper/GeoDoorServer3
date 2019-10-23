@@ -81,11 +81,11 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+                    _iDataSingleton.AddErrorLog(new ErrorLog()
                     {
                         LogLevel = LogLevel.Debug,
                         MsgDateTime = DateTime.Now,
-                        Message = $"{Input.UserName} logged in."
+                        Message = $"{typeof(LoginModel)}:OnPostAsync => {Input.UserName} logged in."
                     });
                     return LocalRedirect(returnUrl);
                 }
@@ -96,11 +96,11 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
-                    _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+                    _iDataSingleton.AddErrorLog(new ErrorLog()
                     {
                         LogLevel = LogLevel.Debug,
                         MsgDateTime = DateTime.Now,
-                        Message = $"{Input.UserName} account locked out."
+                        Message = $"{typeof(LoginModel)}:OnPostAsync {Input.UserName} account locked out."
                     });
                     return RedirectToPage("./Lockout");
                 }

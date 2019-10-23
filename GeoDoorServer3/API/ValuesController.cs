@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+using System.Linq;
 using System.Threading.Tasks;
 using GeoDoorServer3.API.Model;
 using GeoDoorServer3.CustomService;
 using GeoDoorServer3.Data;
 using GeoDoorServer3.Models.DataModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GeoDoorServer3.API
 {
@@ -25,87 +23,94 @@ namespace GeoDoorServer3.API
             _context = context;
             _openHab = openHab;
             _iDataSingleton = iDataSingleton;
-
-            _items.Add(new CommandItem()
-            {
-                Id = 102,
-                CommandName = "whatever",
-                Command = Command.CheckUser
-            });
         }
-
-        private List<CommandItem> _items = new List<CommandItem>();
 
         // GET: api/<controller>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        //[HttpGet]
+        public async Task<ActionResult<CommandItem>> Get()
         {
-            return new string[] {"value1", "value2"};
-        }
-
-        // GET api/<controller>/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<CommandItem>> GetCommandItem(int id)
-        {
-            _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+            CommandItem commandItem = new CommandItem()
             {
-                LogLevel = LogLevel.Debug,
-                MsgDateTime = DateTime.Now,
-                Message = $"GetCommandItem id => { id}"
-            });
+                Id = "66488732346",
+                Command = 0,
+                CommandValue = "OK"
+            };
 
-            await _openHab.GetData("dsa");
-            var commandItem = await GetItemAsync(id);
-            if (null != commandItem)
-                return commandItem;
-            else
-            {
-                return NotFound();
-            }
+            return Accepted(commandItem);
         }
 
-        private Task<CommandItem> GetItemAsync(int id)
-        {
-            return Task.Run(() => _items.Find(e => e.Id.Equals(id)));
-        }
+        // GET api/<controller>/command/5
+        //[HttpGet("command/{id}")]
+        //public async Task<ActionResult<CommandItem>> GetCommandItem(int id)
+        //{
+        //    _iDataSingleton.AddErrorLog(new ErrorLog()
+        //    {
+        //        LogLevel = LogLevel.Debug,
+        //        MsgDateTime = DateTime.Now,
+        //        Message = $"{typeof(ValuesController)}:GetCommandItem => doorStatus"
+        //    });
+
+        //    string doorStatus = await _openHab.GetData(_iDataSingleton.GetGatePath());
+        //    if (null != commandItem)
+        //        return commandItem;
+        //    else
+        //    {
+        //        return NotFound();
+        //    }
+        //}
+
 
         // POST api/<controller>
         [HttpPost]
-        public async Task<ActionResult<CommandItem>> PostCommandItem(CommandItem item)
+        public async Task<ActionResult<CommandItem>> PostCommandItem([FromBody]CommandItem item)
         {
-            _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+            _iDataSingleton.AddErrorLog(new ErrorLog()
             {
                 LogLevel = LogLevel.Debug,
                 MsgDateTime = DateTime.Now,
-                Message = $"Post id=> {item.Id} | CommandName=> {item.CommandName} | Command=> {item.Command}"
+                Message = $"{typeof(ValuesController)}:PostCommandItem => {item}"
             });
 
-            await PutItemAsync(item);
-            await _openHab.PostData("whatever");
+            if (!_context.Users.Any(u => u.PhoneId.Equals(item.Id)))
+                return NotFound();
+
+            User user = await _context.Users.SingleAsync(u => u.PhoneId.Equals(item.Id));
+
+            user.LastConnection = DateTime.Now;
+
+            if (user.AccessRights.Equals(AccessRights.NotAllowed))
+                return Accepted(new CommandItem()
+                {
+                    Id = item.Id,
+                    Command = item.Command,
+                    CommandValue = AccessRights.NotAllowed.ToString()
+                });
+            
+            await _openHab.PostData(_iDataSingleton.SetGatePath(), "ON");
 
             return Accepted(new CommandItem()
             {
-                Id = 815,
-                Command = Command.CheckUser,
-                CommandName = "got it!!!"
+                Id = item.Id,
+                Command = item.Command,
+                CommandValue = "OK"
             });
         }
 
-        private Task PutItemAsync(CommandItem item)
+        private void CommandItemHandler(CommandItem item)
         {
-            return Task.Run(() => _items.Add(item));
+
         }
 
         // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public void Put(int id, string name, [FromBody] string value)
-        {
-        }
+        //[HttpPut("{id}")]
+        //public void Put(int id, string name, [FromBody] string value)
+        //{
+        //}
 
         // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id, string name)
-        {
-        }
+        //[HttpDelete("{id}")]
+        //public void Delete(int id, string name)
+        //{
+        //}
     }
 }

@@ -17,6 +17,7 @@ namespace GeoDoorServer3.CustomService
             _iDataSingleton = iDataSingleton;
         }
 
+        // Gets Data from the OpenHab Rest API
         public async Task<string> GetData(string itemPath)
         {
             HttpClient client = new HttpClient();
@@ -26,36 +27,36 @@ namespace GeoDoorServer3.CustomService
 
             var result = await client.GetStringAsync(itemPath);
 
-            _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+            _iDataSingleton.AddErrorLog(new ErrorLog()
             {
                 LogLevel = LogLevel.Debug,
                 MsgDateTime = DateTime.Now,
-                Message = $"GetOpenHabStatus => {result}"
+                Message = $"{typeof(OpenHabMessageService)}:GetStringAsync => GetOpenHabStatus => {result}"
             });
             return result;
         }
 
-        public async Task<bool> PostData(string itemName)
+        // Posts Data to the OpenHab Rest API
+        public async Task<bool> PostData(string itemPath, string value)
         {
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://192.168.1.114:8080/rest/items/");
             client.DefaultRequestHeaders
                 .Accept
                 .Add(new MediaTypeWithQualityHeaderValue("text/plain"));
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "eg_buero");
-            request.Content = new StringContent("ON",
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, itemPath);
+            request.Content = new StringContent(value,
                 Encoding.UTF8,
                 "text/plain");
 
             await client.SendAsync(request)
                 .ContinueWith(responseTask =>
                 {
-                    _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+                    _iDataSingleton.AddErrorLog(new ErrorLog()
                     {
                         LogLevel = LogLevel.Debug,
                         MsgDateTime = DateTime.Now,
-                        Message = $"Response: {responseTask.Result}"
+                        Message = $"{typeof(OpenHabMessageService)}:PostData => Response: {responseTask.Result}"
                     });
                 });
             return false;

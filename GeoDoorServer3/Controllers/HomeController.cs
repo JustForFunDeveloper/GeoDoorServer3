@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using GeoDoorServer3.CustomService;
 using GeoDoorServer3.CustomService.Models;
 using GeoDoorServer3.Data;
@@ -16,15 +17,17 @@ namespace GeoDoorServer3.Controllers
     {
         private readonly UserDbContext _context;
         private readonly IDataSingleton _iDataSingleton;
+        private readonly IOpenHabMessageService _habMessageService;
 
         private int _max_Count = 100;
 
         private DataModel _myDataModel { get; set; }
 
-        public HomeController(UserDbContext context, IDataSingleton dataSingleton)
+        public HomeController(UserDbContext context, IDataSingleton dataSingleton, IOpenHabMessageService habMessageService)
         {
             _context = context;
             _iDataSingleton = dataSingleton;
+            _habMessageService = habMessageService;
             _myDataModel = new DataModel(_iDataSingleton);
 
 

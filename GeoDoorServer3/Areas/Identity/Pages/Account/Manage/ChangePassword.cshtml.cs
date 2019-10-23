@@ -96,11 +96,11 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.RefreshSignInAsync(user);
             _logger.LogInformation("User changed their password successfully.");
-            _iDataSingleton.GetConcurrentQueue().Enqueue(new ErrorLog()
+            _iDataSingleton.AddErrorLog(new ErrorLog()
             {
                 LogLevel = LogLevel.Debug,
                 MsgDateTime = DateTime.Now,
-                Message = $"{User} changed their password successfully."
+                Message = $"{typeof(ChangePasswordModel)}:OnPostAsync => {User} changed their password successfully."
             });
             StatusMessage = "Your password has been changed.";
 

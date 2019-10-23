@@ -8,6 +8,8 @@ namespace GeoDoorServer3.CustomService
     {
         private OpenHabStatus _openHabStatus;
         private ConcurrentQueue<ErrorLog> _concurrentQueue;
+        private readonly string _getGate = "http://192.168.1.114:8080/rest/items/eg_buero/state";
+        private readonly  string _setGate = "http://192.168.1.114:8080/rest/items/eg_buero";
 
         public DataSingleton()
         {
@@ -15,14 +17,29 @@ namespace GeoDoorServer3.CustomService
             _concurrentQueue = new ConcurrentQueue<ErrorLog>();
         }
 
+        public string GetGatePath()
+        {
+            return _getGate;
+        }
+
+        public string SetGatePath()
+        {
+            return _setGate;
+        }
+
         public OpenHabStatus GetOpenHabStatus()
         {
             return _openHabStatus;
         }
 
-        public ConcurrentQueue<ErrorLog> GetConcurrentQueue()
+        public ConcurrentQueue<ErrorLog> GetQueue()
         {
             return _concurrentQueue;
+        }
+
+        public void AddErrorLog(ErrorLog errorLog)
+        {
+            _concurrentQueue.Enqueue(errorLog);
         }
     }
 }
