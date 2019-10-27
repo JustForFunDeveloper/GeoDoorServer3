@@ -31,7 +31,7 @@ namespace GeoDoorServer3.CustomService
 
         public async Task<string> GetDoorStatus()
         {
-            return await _openHab.GetData(_dataSingleton.GetGatePath());     
+            return await _openHab.GetData(_dataSingleton.GatePathStatus());     
         }
 
         public OpenHabStatus GetOpenHabStatus()

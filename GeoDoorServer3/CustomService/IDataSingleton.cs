@@ -6,8 +6,8 @@ namespace GeoDoorServer3.CustomService
 {
     public interface IDataSingleton
     {
-        string GetGatePath();
-        string SetGatePath();
+        string GatePathStatus();
+        string GatePathValueChange();
 
         OpenHabStatus GetOpenHabStatus();
 

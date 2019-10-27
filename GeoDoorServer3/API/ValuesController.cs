@@ -64,41 +64,103 @@ namespace GeoDoorServer3.API
         [HttpPost]
         public async Task<ActionResult<CommandItem>> PostCommandItem([FromBody]CommandItem item)
         {
-            _iDataSingleton.AddErrorLog(new ErrorLog()
+            try
             {
-                LogLevel = LogLevel.Debug,
-                MsgDateTime = DateTime.Now,
-                Message = $"{typeof(ValuesController)}:PostCommandItem => {item}"
-            });
+                _iDataSingleton.AddErrorLog(new ErrorLog()
+                {
+                    LogLevel = LogLevel.Debug,
+                    MsgDateTime = DateTime.Now,
+                    Message = $"{typeof(ValuesController)}:PostCommandItem => {item}"
+                });
 
-            if (!_context.Users.Any(u => u.PhoneId.Equals(item.Id)))
-                return NotFound();
+                if (!CheckCommandItem(item))
+                    return NotFound();
 
-            User user = await _context.Users.SingleAsync(u => u.PhoneId.Equals(item.Id));
+                if (!await CheckUserOrCreate(item))
+                {
+                    return Accepted(new CommandItem()
+                    {
+                        Id = item.Id,
+                        Command = item.Command,
+                        CommandValue = "User not allowed!"
+                    });
+                }
 
-            user.LastConnection = DateTime.Now;
+                await _openHab.PostData(_iDataSingleton.GatePathValueChange(), "ON");
 
-            if (user.AccessRights.Equals(AccessRights.NotAllowed))
                 return Accepted(new CommandItem()
                 {
                     Id = item.Id,
                     Command = item.Command,
-                    CommandValue = AccessRights.NotAllowed.ToString()
+                    CommandValue = "OK"
                 });
-            
-            await _openHab.PostData(_iDataSingleton.SetGatePath(), "ON");
-
-            return Accepted(new CommandItem()
+            }
+            catch (Exception e)
             {
-                Id = item.Id,
-                Command = item.Command,
-                CommandValue = "OK"
-            });
+                _iDataSingleton.AddErrorLog(new ErrorLog()
+                {
+                    LogLevel = LogLevel.Error,
+                    MsgDateTime = DateTime.Now,
+                    Message = $"{typeof(ValuesController)}:PostCommandItem Exception => {e}"
+                });
+                return NotFound();
+            }
         }
 
-        private void CommandItemHandler(CommandItem item)
+        private async Task<void> CommandItemHandler(CommandItem item)
         {
+            switch (item.Command)
+            {
+                case Command.OpenDoor:
+                    break;
+                case Command.OpenGate:
+                    break;
+            }
+        }
 
+        /// <summary>
+        /// Check only allowed values for the CommandItem.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>Returns true if values are correct otherwise false.</returns>
+        private bool CheckCommandItem(CommandItem item)
+        {
+            if (item.Command.Equals(Command.CheckUser) ||
+                item.Command.Equals(Command.OpenDoor) ||
+                item.Command.Equals(Command.OpenGate))
+            {
+                if (item.CommandValue.Equals("ON") ||
+                    item.CommandValue.Equals("OFF") ||
+                    item.CommandValue.Equals("0"))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private async Task<bool> CheckUserOrCreate(CommandItem item)
+        {
+            if (_context.Users.Any(u => u.PhoneId.Equals(item.Id)))
+            {
+                User user = await _context.Users.SingleAsync(u => u.PhoneId.Equals(item.Id));
+                user.LastConnection = DateTime.Now;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            else if (item.Command.Equals(Command.CheckUser))
+            {
+                User user = new User()
+                {
+                    PhoneId = item.Id,
+                    Name = "Unknown",
+                    AccessRights = AccessRights.NotAllowed,
+                    LastConnection = DateTime.Now
+                };
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+            }
+            return false;
         }
 
         // PUT api/<controller>/5
