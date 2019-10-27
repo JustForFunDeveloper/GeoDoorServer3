@@ -8,14 +8,14 @@ namespace GeoDoorServer3.CustomService
     {
         // TODO: Path should be configurable
 
-        private OpenHabStatus _openHabStatus;
+        private SystemStatus _systemStatus;
         private ConcurrentQueue<ErrorLog> _concurrentQueue;
         private readonly string _getGate = "http://192.168.1.114:8080/rest/items/eg_esstisch/state";
         private readonly  string _setGate = "http://192.168.1.114:8080/rest/items/eg_esstisch";
 
         public DataSingleton()
         {
-            _openHabStatus = new OpenHabStatus();
+            _systemStatus = new SystemStatus();
             _concurrentQueue = new ConcurrentQueue<ErrorLog>();
         }
 
@@ -29,9 +29,9 @@ namespace GeoDoorServer3.CustomService
             return _setGate;
         }
 
-        public OpenHabStatus GetOpenHabStatus()
+        public SystemStatus GetSystemStatus()
         {
-            return _openHabStatus;
+            return _systemStatus;
         }
 
         public ConcurrentQueue<ErrorLog> GetQueue()

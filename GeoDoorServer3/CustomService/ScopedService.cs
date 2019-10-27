@@ -9,7 +9,7 @@ namespace GeoDoorServer3.CustomService
     internal interface IScopedService
     {
         Task<string> GetDoorStatus();
-        OpenHabStatus GetOpenHabStatus();
+        SystemStatus GetOpenHabStatus();
         void WriteErrorLogs();
         void AddQueueMessage(ErrorLog errorLog);
     }
@@ -34,9 +34,9 @@ namespace GeoDoorServer3.CustomService
             return await _openHab.GetData(_dataSingleton.GatePathStatus());     
         }
 
-        public OpenHabStatus GetOpenHabStatus()
+        public SystemStatus GetOpenHabStatus()
         {
-            return _dataSingleton.GetOpenHabStatus();
+            return _dataSingleton.GetSystemStatus();
         }
 
         public void WriteErrorLogs()

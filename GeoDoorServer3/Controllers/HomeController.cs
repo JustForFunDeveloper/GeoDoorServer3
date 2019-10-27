@@ -90,16 +90,16 @@ namespace GeoDoorServer3.Controllers
                 _iDataSingleton = iDataSingleton;
             }
 
-            public OpenHabStatus OpenHabStatus
+            public SystemStatus SystemStatus
             {
-                get { return _iDataSingleton.GetOpenHabStatus(); }
+                get { return _iDataSingleton.GetSystemStatus(); }
             }
 
             public string OnlineTime
             {
                 get
                 {
-                    TimeSpan timeSpan = _iDataSingleton.GetOpenHabStatus().OnlineTimeSpan;
+                    TimeSpan timeSpan = _iDataSingleton.GetSystemStatus().OnlineTimeSpan;
                     return timeSpan.ToString(@"hh\:mm\:ss");
                 }
             }

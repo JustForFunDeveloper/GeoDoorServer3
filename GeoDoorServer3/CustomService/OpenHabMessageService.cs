@@ -31,12 +31,17 @@ namespace GeoDoorServer3.CustomService
             {
                 LogLevel = LogLevel.Debug,
                 MsgDateTime = DateTime.Now,
-                Message = $"{typeof(OpenHabMessageService)}:GetStringAsync => GetOpenHabStatus => {result}"
+                Message = $"{typeof(OpenHabMessageService)}:GetStringAsync => GetSystemStatus => {result}"
             });
             return result;
         }
 
-        // Posts Data to the OpenHab Rest API
+        /// <summary>
+        /// Posts Data to the OpenHab Rest API
+        /// </summary>
+        /// <param name="itemPath"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public async Task<bool> PostData(string itemPath, string value)
         {
             HttpClient client = new HttpClient();
@@ -58,6 +63,8 @@ namespace GeoDoorServer3.CustomService
                         MsgDateTime = DateTime.Now,
                         Message = $"{typeof(OpenHabMessageService)}:PostData => Response: {responseTask.Result}"
                     });
+
+                    _iDataSingleton.GetSystemStatus().OpenHabStatus = responseTask.Result.IsSuccessStatusCode;
                 });
             return false;
         }

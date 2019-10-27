@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GeoDoorServer3.API.Model;
 using GeoDoorServer3.CustomService;
+using GeoDoorServer3.CustomService.Models;
 using GeoDoorServer3.Data;
 using GeoDoorServer3.Models.DataModels;
 using Microsoft.AspNetCore.Mvc;
@@ -86,8 +87,6 @@ namespace GeoDoorServer3.API
                     });
                 }
 
-                await _openHab.PostData(_iDataSingleton.GatePathValueChange(), "ON");
-
                 return Accepted(new CommandItem()
                 {
                     Id = item.Id,
@@ -107,13 +106,44 @@ namespace GeoDoorServer3.API
             }
         }
 
-        private async Task<void> CommandItemHandler(CommandItem item)
+        private async Task<ActionResult<CommandItem>> CommandItemHandler(CommandItem item)
         {
             switch (item.Command)
             {
                 case Command.OpenDoor:
                     break;
                 case Command.OpenGate:
+                    if (_iDataSingleton.GetSystemStatus().GateStatus.Equals(GateStatus.GateOpen))
+                    {
+                        if (item.CommandValue.Equals("Open") ||
+                            item.CommandValue.Equals("ForceOpen"))
+                        {
+                            return Accepted(new CommandItem()
+                            {
+                                Id = item.Id,
+                                Command = item.Command,
+                                CommandValue = "Already Open"
+                            });
+                        }
+                        else if (item.CommandValue.Equals("Close") ||
+                                 item.CommandValue.Equals("ForceClose"))
+                        {
+
+                        }
+                    }
+                    else if (_iDataSingleton.GetSystemStatus().GateStatus.Equals(GateStatus.GateOpening))
+                    {
+
+                        await _openHab.PostData(_iDataSingleton.GatePathValueChange(), item.CommandValue);
+                    }
+                    else if (_iDataSingleton.GetSystemStatus().GateStatus.Equals(GateStatus.GateClosed))
+                    {
+
+                    }
+                    else if (_iDataSingleton.GetSystemStatus().GateStatus.Equals(GateStatus.GateClosing))
+                    {
+
+                    }
                     break;
             }
         }
@@ -129,8 +159,10 @@ namespace GeoDoorServer3.API
                 item.Command.Equals(Command.OpenDoor) ||
                 item.Command.Equals(Command.OpenGate))
             {
-                if (item.CommandValue.Equals("ON") ||
-                    item.CommandValue.Equals("OFF") ||
+                if (item.CommandValue.Equals("Open") ||
+                    item.CommandValue.Equals("Close") ||
+                    item.CommandValue.Equals("ForceOpen") ||
+                    item.CommandValue.Equals("ForceClose") ||
                     item.CommandValue.Equals("0"))
                 {
                     return true;

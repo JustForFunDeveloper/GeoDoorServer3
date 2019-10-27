@@ -9,7 +9,7 @@ namespace GeoDoorServer3.CustomService
         string GatePathStatus();
         string GatePathValueChange();
 
-        OpenHabStatus GetOpenHabStatus();
+        SystemStatus GetSystemStatus();
 
         ConcurrentQueue<ErrorLog> GetQueue();
         void AddErrorLog(ErrorLog errorLog);

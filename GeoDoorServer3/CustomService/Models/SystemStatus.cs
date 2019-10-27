@@ -1,0 +1,172 @@
+﻿using System;
+using System.Timers;
+
+namespace GeoDoorServer3.CustomService.Models
+{
+    public class SystemStatus
+    {
+        public TimeSpan OnlineTimeSpan
+        {
+            get
+            {
+                lock (_onlineTimeSpanLock)
+                {
+                    return _onlineTimeSpan;
+                }
+            }
+            set
+            {
+                lock (_onlineTimeSpanLock)
+                {
+                    _onlineTimeSpan = value;
+                }
+            }
+        }
+
+        public DateTime StartTime
+        {
+            get
+            {
+                lock (_startTimeLock)
+                {
+                    return _startTime;
+                }
+            }
+            set
+            {
+                lock (_startTimeLock)
+                {
+                    _startTime = value;
+                }
+            }
+        }
+
+        public GateStatus GateStatus
+        {
+            get
+            {
+                lock (_gateStatusLock)
+                {
+                    return _gateStatus;
+                }
+            }
+            set
+            {
+                lock (_gateStatusLock)
+                {
+                    if (!IsGateMoving)
+                        _gateStatus = value;
+                }
+            }
+        }
+
+        public bool IsGateMoving
+        {
+            get
+            {
+                lock (_isGateMovingLock)
+                {
+                    return _isGateMoving;
+                }
+            }
+            set
+            {
+                lock (_isGateMovingLock)
+                {
+                    if (value)
+                    {
+                        if (GateStatus.Equals(GateStatus.GateOpen))
+                        {
+                            StartGateMotionTimer();
+                            GateStatus = GateStatus.GateClosing;
+                        }
+                        else if (GateStatus.Equals(GateStatus.GateClosed))
+                        {
+                            StartGateMotionTimer();
+                            GateStatus = GateStatus.GateOpening;
+                        }
+                        else
+                        {
+                            GateStatus = GateStatus.Undefined;
+                        }
+                    }
+                    else
+                    {
+                        if (GateStatus.Equals(GateStatus.GateClosing))
+                        {
+                            GateStatus = GateStatus.GateClosed;
+                        }
+                        else if (GateStatus.Equals(GateStatus.GateOpening))
+                        {
+                            GateStatus = GateStatus.GateOpen;
+                        }
+                    }
+                    _isGateMoving = value;
+                }
+            }
+        }
+
+        public bool OpenHabStatus
+        {
+            get
+            {
+                lock (_openHabStatusLock)
+                {
+                    return _openHabStatus;
+                }
+            }
+            set
+            {
+                lock (_openHabStatusLock)
+                {
+                    _openHabStatus = value;
+                }
+            }
+        }
+
+        private TimeSpan _onlineTimeSpan;
+        private DateTime _startTime;
+        private GateStatus _gateStatus;
+        private bool _isGateMoving;
+        private bool _openHabStatus;
+
+        private Timer _gateMotionTimer;
+
+        private readonly object _onlineTimeSpanLock = new object();
+        private readonly object _startTimeLock = new object();
+        private readonly object _gateStatusLock = new object();
+        private readonly object _isGateMovingLock = new object();
+        private readonly object _openHabStatusLock = new object();
+
+        public SystemStatus()
+        {
+            _onlineTimeSpan = TimeSpan.Zero;
+            _startTime = DateTime.Now;
+            _gateStatus = GateStatus.GateOpen;
+            _openHabStatus = false;
+
+            _gateMotionTimer = new Timer();
+            _gateMotionTimer.Interval = 30000;
+            _gateMotionTimer.Elapsed += (sender, args) =>
+            {
+                _gateMotionTimer.Stop();
+                IsGateMoving = false;
+            };
+        }
+
+        private void StartGateMotionTimer()
+        {
+            _gateMotionTimer.Start();
+        }
+    }
+
+    public enum GateStatus
+    {
+        GateOpen,
+        GateOpening,
+        GateClosing,
+        GateClosed,
+        Undefined
+    }
+
+}

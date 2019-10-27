@@ -63,12 +63,12 @@ namespace GeoDoorServer3.CustomService
                         .GetRequiredService<IDataSingleton>();
 
                 if (result.Equals("ON"))
-                    scopedDataSingleton.GetOpenHabStatus().GateStatus = GateStatus.GateClosed;
+                    scopedDataSingleton.GetSystemStatus().GateStatus = GateStatus.GateClosed;
                 else if (result.Equals("OFF"))
-                    scopedDataSingleton.GetOpenHabStatus().GateStatus = GateStatus.GateOpen;
+                    scopedDataSingleton.GetSystemStatus().GateStatus = GateStatus.GateOpen;
 
-                scopedDataSingleton.GetOpenHabStatus().OnlineTimeSpan =
-                    DateTime.Now.Subtract(scopedDataSingleton.GetOpenHabStatus().StartTime);
+                scopedDataSingleton.GetSystemStatus().OnlineTimeSpan =
+                    DateTime.Now.Subtract(scopedDataSingleton.GetSystemStatus().StartTime);
             }
         }
 
