@@ -57,15 +57,14 @@ namespace GeoDoorServer3.CustomService
 
                 string result = await scopedProcessingService.GetDoorStatus();
 
-
                 var scopedDataSingleton =
                     scope.ServiceProvider
                         .GetRequiredService<IDataSingleton>();
 
                 if (result.Equals("ON"))
-                    scopedDataSingleton.GetSystemStatus().GateStatus = GateStatus.GateClosed;
-                else if (result.Equals("OFF"))
                     scopedDataSingleton.GetSystemStatus().GateStatus = GateStatus.GateOpen;
+                else if (result.Equals("OFF"))
+                    scopedDataSingleton.GetSystemStatus().GateStatus = GateStatus.GateClosed;
 
                 scopedDataSingleton.GetSystemStatus().OnlineTimeSpan =
                     DateTime.Now.Subtract(scopedDataSingleton.GetSystemStatus().StartTime);

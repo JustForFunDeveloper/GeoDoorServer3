@@ -78,27 +78,31 @@ namespace GeoDoorServer3.CustomService.Models
                         if (GateStatus.Equals(GateStatus.GateOpen))
                         {
                             StartGateMotionTimer();
-                            GateStatus = GateStatus.GateClosing;
+                            _gateStatus = GateStatus.GateClosing;
                         }
                         else if (GateStatus.Equals(GateStatus.GateClosed))
                         {
                             StartGateMotionTimer();
-                            GateStatus = GateStatus.GateOpening;
+                            _gateStatus = GateStatus.GateOpening;
                         }
-                        else
+                        else if (GateStatus.Equals(GateStatus.GateClosing))
                         {
-                            GateStatus = GateStatus.Undefined;
+                            _gateStatus = GateStatus.GateOpening;
+                        }
+                        else if (GateStatus.Equals(GateStatus.GateOpening))
+                        {
+                            _gateStatus = GateStatus.GateClosing;
                         }
                     }
                     else
                     {
                         if (GateStatus.Equals(GateStatus.GateClosing))
                         {
-                            GateStatus = GateStatus.GateClosed;
+                            _gateStatus = GateStatus.GateClosed;
                         }
                         else if (GateStatus.Equals(GateStatus.GateOpening))
                         {
-                            GateStatus = GateStatus.GateOpen;
+                            _gateStatus = GateStatus.GateOpen;
                         }
                     }
                     _isGateMoving = value;

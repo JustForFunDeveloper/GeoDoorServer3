@@ -10,8 +10,8 @@ namespace GeoDoorServer3.CustomService
 
         private SystemStatus _systemStatus;
         private ConcurrentQueue<ErrorLog> _concurrentQueue;
-        private readonly string _getGate = "http://192.168.1.114:8080/rest/items/eg_esstisch/state";
-        private readonly  string _setGate = "http://192.168.1.114:8080/rest/items/eg_esstisch";
+        private readonly string _getGate = "http://192.168.1.114:8080/rest/items/eg_tor_stat/state";
+        private readonly  string _setGate = "http://192.168.1.114:8080/rest/items/eg_wand";
 
         public DataSingleton()
         {

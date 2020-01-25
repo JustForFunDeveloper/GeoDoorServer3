@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-
-namespace GeoDoorServer3.API.Model
+﻿namespace GeoDoorServer3.API.Model
 {
     public class CommandItem
     {
@@ -19,5 +12,23 @@ namespace GeoDoorServer3.API.Model
         CheckUser,
         OpenDoor,
         OpenGate
+    }
+
+    public enum CommandValue
+    {
+        Open,
+        Close,
+        ForceOpen,
+        ForceClose
+    }
+
+    public enum CommandValueAnswer
+    {
+        AlreadyOpen,
+        AlreadyClosed,
+        GateOpening,
+        GateClosing,
+        AlreadyOpening,
+        AlreadyClosing
     }
 }

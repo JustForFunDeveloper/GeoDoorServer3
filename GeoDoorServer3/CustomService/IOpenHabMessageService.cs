@@ -5,6 +5,6 @@ namespace GeoDoorServer3.CustomService
     public interface IOpenHabMessageService
     {
         Task<string> GetData(string itemName);
-        Task<bool> PostData(string itemName, string value);
+        Task PostData(string itemName, string value, bool toggle = false);
     }
 }

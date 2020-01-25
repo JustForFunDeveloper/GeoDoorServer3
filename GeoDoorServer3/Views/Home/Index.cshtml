@@ -11,6 +11,18 @@
     @if (SignInManager.IsSignedIn(User))
     {
         <div class="card-deck" style="margin-top: 20px">
+            <div class="card text-white bg-dark mb-1">
+                <div class="card-header">
+                    <h4>
+                        <span style="color: #4878C0">Gate Status</span>
+                    </h4>
+                </div>
+                <div class="card-body align-items-center d-flex justify-content-center">
+                    <h5 class="card-title ">@Model.SystemStatus.GateStatus</h5>
+                </div>
+            </div>
+        </div>
+        <div class="card-deck" style="margin-top: 20px">
             <div class="card text-white bg-dark mb-3">
                 <div class="card-header">
                     <h4>

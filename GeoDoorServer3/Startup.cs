@@ -1,4 +1,5 @@
-﻿using GeoDoorServer3.CustomService;
+﻿using System.Text.Json.Serialization;
+using GeoDoorServer3.CustomService;
 using GeoDoorServer3.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,7 +36,11 @@ namespace GeoDoorServer3
 
             //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             //services.AddControllers();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddJsonOptions(options => 
+            { 
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.IgnoreNullValues = true;
+            });
 
             services.AddScoped<IOpenHabMessageService, OpenHabMessageService>();
 

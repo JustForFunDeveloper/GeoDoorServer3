@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using GeoDoorServer3.CustomService;
 using GeoDoorServer3.CustomService.Models;
 using GeoDoorServer3.Data;
@@ -54,7 +53,7 @@ namespace GeoDoorServer3.Controllers
             {
                 if (iter >= _max_Count)
                     break;
-
+                
                 _myDataModel.LogMessagesList.Add(errorLog.ToString());
                 iter++;
             }
@@ -62,6 +61,7 @@ namespace GeoDoorServer3.Controllers
 
         public IActionResult Index()
         {
+            Response.Headers.Add("Refresh","3");
             return View(_myDataModel);
         }
 
