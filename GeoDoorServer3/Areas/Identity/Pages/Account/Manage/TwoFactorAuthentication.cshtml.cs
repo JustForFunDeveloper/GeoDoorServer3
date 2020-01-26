@@ -27,7 +27,7 @@ namespace GeoDoorServer3.Areas.Identity.Pages.Account.Manage
             //_logger = logger;
         }
 
-        public async Task<IActionResult> OnGet()
+        public IActionResult OnGet()
         {
             return this.NotFound();
         }

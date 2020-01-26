@@ -31,7 +31,7 @@ namespace GeoDoorServer3.CustomService
             return Task.CompletedTask;
         }
 
-        private async void DoWork(object state)
+        private void DoWork(object state)
         {
             using (var scope = Services.CreateScope())
             {

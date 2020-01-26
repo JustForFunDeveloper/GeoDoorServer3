@@ -1,17 +1,19 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq;
 using GeoDoorServer3.CustomService.Models;
+using GeoDoorServer3.Data;
 using GeoDoorServer3.Models.DataModels;
 
 namespace GeoDoorServer3.CustomService
 {
     public class DataSingleton : IDataSingleton
     {
-        // TODO: Path should be configurable
-
         private SystemStatus _systemStatus;
         private ConcurrentQueue<ErrorLog> _concurrentQueue;
-        private readonly string _getGate = "http://192.168.1.114:8080/rest/items/eg_tor_stat/state";
-        private readonly  string _setGate = "http://192.168.1.114:8080/rest/items/eg_wand";
+        //private readonly UserDbContext _context;
+        
+        private string _gateStatus = "";
+        private string _gate = "";
 
         public DataSingleton()
         {
@@ -19,14 +21,29 @@ namespace GeoDoorServer3.CustomService
             _concurrentQueue = new ConcurrentQueue<ErrorLog>();
         }
 
+        public void SetGateTimeOut(int gateTimeOut)
+        {
+            _systemStatus.GateTimeout = gateTimeOut;
+        }
+
+        public void SetStatusGatePath(string gateStatusPath)
+        {
+            _gateStatus = gateStatusPath;
+        }
+        
+        public void SetGatePath(string gatePath)
+        {
+            _gate = gatePath;
+        }
+
         public string GatePathStatus()
         {
-            return _getGate;
+            return _gateStatus;
         }
 
         public string GatePathValueChange()
         {
-            return _setGate;
+            return _gate;
         }
 
         public SystemStatus GetSystemStatus()

@@ -1,10 +1,26 @@
 ﻿using System;
 using System.Timers;
+using GeoDoorServer3.Data;
 
 namespace GeoDoorServer3.CustomService.Models
 {
     public class SystemStatus
     {
+        private TimeSpan _onlineTimeSpan;
+        private DateTime _startTime;
+        private GateStatus _gateStatus;
+        private bool _isGateMoving;
+        private bool _openHabStatus;
+
+        private Timer _gateMotionTimer;
+        private int _gateTimeout;
+
+        private readonly object _onlineTimeSpanLock = new object();
+        private readonly object _startTimeLock = new object();
+        private readonly object _gateStatusLock = new object();
+        private readonly object _isGateMovingLock = new object();
+        private readonly object _openHabStatusLock = new object();
+        
         public TimeSpan OnlineTimeSpan
         {
             get
@@ -128,19 +144,11 @@ namespace GeoDoorServer3.CustomService.Models
             }
         }
 
-        private TimeSpan _onlineTimeSpan;
-        private DateTime _startTime;
-        private GateStatus _gateStatus;
-        private bool _isGateMoving;
-        private bool _openHabStatus;
-
-        private Timer _gateMotionTimer;
-
-        private readonly object _onlineTimeSpanLock = new object();
-        private readonly object _startTimeLock = new object();
-        private readonly object _gateStatusLock = new object();
-        private readonly object _isGateMovingLock = new object();
-        private readonly object _openHabStatusLock = new object();
+        public int GateTimeout
+        {
+            get => _gateTimeout;
+            set => _gateTimeout = value;
+        }
 
         public SystemStatus()
         {
@@ -160,6 +168,7 @@ namespace GeoDoorServer3.CustomService.Models
 
         private void StartGateMotionTimer()
         {
+            _gateMotionTimer.Interval = _gateTimeout;
             _gateMotionTimer.Start();
         }
     }
@@ -169,8 +178,6 @@ namespace GeoDoorServer3.CustomService.Models
         GateOpen,
         GateOpening,
         GateClosing,
-        GateClosed,
-        Undefined
+        GateClosed
     }
-
 }
