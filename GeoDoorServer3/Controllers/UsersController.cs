@@ -44,14 +44,17 @@ namespace GeoDoorServer3.Controllers
             {
                 return NotFound();
             }
-
-            return View(user);
+            if (User.Identity.IsAuthenticated)
+                return View(user);
+            return LocalRedirect("/Identity/Account/Login");
         }
 
         // GET: Users/Create
         public IActionResult Create()
         {
-            return View();
+            if (User.Identity.IsAuthenticated)
+                return View();
+            return LocalRedirect("/Identity/Account/Login");
         }
 
         // POST: Users/Create
@@ -87,7 +90,9 @@ namespace GeoDoorServer3.Controllers
             {
                 return NotFound();
             }
-            return View(user);
+            if (User.Identity.IsAuthenticated)
+                return View(user);
+            return LocalRedirect("/Identity/Account/Login");
         }
 
         // POST: Users/Edit/5
@@ -143,7 +148,9 @@ namespace GeoDoorServer3.Controllers
                 return NotFound();
             }
 
-            return View(user);
+            if (User.Identity.IsAuthenticated)
+                return View(user);
+            return LocalRedirect("/Identity/Account/Login");
         }
 
         // POST: Users/Delete/5

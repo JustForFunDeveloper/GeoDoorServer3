@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 using GeoDoorServer3.CustomService.Models;
 using GeoDoorServer3.Data;
@@ -14,8 +15,6 @@ namespace GeoDoorServer3.CustomService
         void AddQueueMessage(ErrorLog errorLog);
     }
 
-    // TODO _doorPath should be configurable.
-
     internal class ScopedService : IScopedService
     {
         private readonly IOpenHabMessageService _openHab;
@@ -27,11 +26,15 @@ namespace GeoDoorServer3.CustomService
             _openHab = openHab;
             _dataSingleton = dataSingleton;
             _context = context;
+            
+            _dataSingleton.SetGateTimeOut(_context.Settings.First(settings => settings.Id > 0).GateTimeout);
+            _dataSingleton.SetStatusGatePath(_context.Settings.First(settings => settings.Id > 0).StatusOpenHabLink);
+            _dataSingleton.SetGatePath(_context.Settings.First(settings => settings.Id > 0).GateOpenHabLink);
         }
 
         public async Task<string> GetDoorStatus()
         {
-            return await _openHab.GetData(_dataSingleton.GatePathStatus());     
+            return await _openHab.GetData(_dataSingleton.GatePathStatus());
         }
 
         public SystemStatus GetOpenHabStatus()
@@ -42,6 +45,21 @@ namespace GeoDoorServer3.CustomService
         public void WriteErrorLogs()
         {
             ConcurrentQueue<ErrorLog> concurrentQueue = _dataSingleton.GetQueue();
+
+            int rowCount = _context.ErrorLogs.Count();
+            int maxRows = _context.Settings.First(row => row.Id > 0).MaxErrorLogRows;
+            
+            if (rowCount > maxRows)
+            {
+                int percentCount = maxRows / 4; // 25% Count of maxRows
+                int nToRemove = (rowCount - maxRows) + percentCount;
+                
+                var lastLogs = _context.ErrorLogs
+                    .OrderBy(row => row.Id)
+                    .Take(nToRemove);
+                
+                _context.RemoveRange(lastLogs);
+            }
 
             foreach (var item in concurrentQueue)
             {
