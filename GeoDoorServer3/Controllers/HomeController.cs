@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using GeoDoorServer3.CustomService;
 using GeoDoorServer3.CustomService.Models;
 using GeoDoorServer3.Data;
 using Microsoft.AspNetCore.Mvc;
 using GeoDoorServer3.Models;
 using GeoDoorServer3.Models.DataModels;
+using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.Logging;
 
 namespace GeoDoorServer3.Controllers
@@ -28,7 +30,9 @@ namespace GeoDoorServer3.Controllers
             _iDataSingleton = dataSingleton;
             _habMessageService = habMessageService;
             _myDataModel = new DataModel(_iDataSingleton);
-
+            
+            string version = Assembly.GetEntryAssembly()?.GetName().Version.ToString();
+            _myDataModel.VersionNumber = $"v{version?.Remove(version.Length - 2)}";
 
             List<User> users = _context.Users.OrderByDescending(u => u.LastConnection).ToList();
             _myDataModel.LastUsers = new List<string>();
@@ -72,7 +76,7 @@ namespace GeoDoorServer3.Controllers
 
         public IActionResult About()
         {
-            return View();
+            return View(_myDataModel);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -111,6 +115,8 @@ namespace GeoDoorServer3.Controllers
             public int Errors { get; set; }
 
             public List<string> LogMessagesList { get; set; }
+            
+            public string VersionNumber { get; set; }
         }
     }
 }
